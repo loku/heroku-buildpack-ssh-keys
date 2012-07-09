@@ -27,8 +27,8 @@ Dir.mktmpdir "env_ssh" do |dir|
   FileUtils.cp "#{ARGV[0]}/deploy/id_rsa", "#{dir}/env_ssh_key"
   FileUtils.chmod 0600, "#{dir}/env_ssh_key"
 
-  `ssh-keygen -e -f #{dir}/env_ssh_key < /dev/null > #{dir}/env_ssh_key.pub.rfc 2>/dev/null`
-  `ssh-keygen -i -f #{dir}/env_ssh_key.pub.rfc > #{dir}/env_ssh_key.pub 2>/dev/null`
+  `ssh-keygen -e -P '' -f #{dir}/env_ssh_key < /dev/null > #{dir}/env_ssh_key.pub.rfc 2>/dev/null`
+  `ssh-keygen -i -P '' -f #{dir}/env_ssh_key.pub.rfc > #{dir}/env_ssh_key.pub 2>/dev/null`
   key = `ssh-keygen -l -f #{dir}/env_ssh_key.pub | awk '{print $2}' | tr -ds ':' '' | egrep -ie "[a-f0-9]{32}" 2>/dev/null`
 
   # if key is empty, abort the build

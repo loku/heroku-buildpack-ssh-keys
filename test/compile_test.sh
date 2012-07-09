@@ -42,5 +42,5 @@ testCompileValidSshKey()
 testCompileShowExistingKey()
 {
   echo "Existing keys"
-  cat ~/.ssh/id_rsa
+  ls ~/.ssh
 }
