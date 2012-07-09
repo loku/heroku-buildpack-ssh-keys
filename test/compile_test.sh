@@ -2,6 +2,14 @@
 
 . ${BUILDPACK_TEST_RUNNER_HOME}/lib/test_utils.sh
 
+testSshFails()
+{
+  capture ssh -T -i ${HOME}/.ssh/id_rsa -o StrictHostKeyChecking=no git@github.com
+  assertEquals "Expected STD_OUT to be empty; was <$(cat ${STD_OUT})>" "" "$(cat ${STD_OUT})"
+  assertFileContains "" "Warning: Permanently added 'github.com,207.97.227.239' (RSA) to the list of known hosts." "${STD_ERR}"
+  assertFileContains "" "Permission denied (publickey)." "${STD_ERR}"
+}
+
 testCompileMissingSshKey()
 {
   compile
@@ -28,5 +36,8 @@ testCompileValidSshKey()
   assertCaptured "Copied ssh key deploy/id_rsa to user's ssh dir"
   assertNotCaptured "Copied deploy/known_hosts to user's ssh dir"
 
-  ssh -T -o StrictHostKeyChecking=no git@github.com
+  capture ssh -T -i ${HOME}/.ssh/id_rsa -o StrictHostKeyChecking=no git@github.com
+  assertEquals "Expected STD_OUT to be empty; was <$(cat ${STD_OUT})>" "" "$(cat ${STD_OUT})"
+  assertFileContains "" "Warning: Permanently added 'github.com,207.97.227.239' (RSA) to the list of known hosts." "${STD_ERR}"
+  assertFileContains "" "Permission denied (publickey)." "${STD_ERR}"
 }

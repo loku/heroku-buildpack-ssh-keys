@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby
+#!/usr/bin/env ruby
 
 require 'tmpdir'
 require 'fileutils'
@@ -17,7 +17,7 @@ end
 
 buildDir   = ARGV[0]
 privateKey = File.expand_path "#{buildDir}/deploy/id_rsa"
-sshHomeDir = File.expand_path "~/.ssh"
+sshHomeDir = File.expand_path "#{ENV["HOME"]}/.ssh"
 
 arrow "Checking for a valid SSH key"
 
