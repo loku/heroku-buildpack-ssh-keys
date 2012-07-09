@@ -4,11 +4,8 @@
 
 testCompileMissingSshKey()
 {
-  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 1 ${rtrn}
-  assertEquals "" "`cat ${STD_ERR}`"
-
-  assertContains "       Can't find the key file"  "`cat ${STD_OUT}`"
+  compile
+  assertCapturedError "Can't find the key file"
 }
 
 testCompileInvalidSshKey()
@@ -16,11 +13,8 @@ testCompileInvalidSshKey()
   mkdir ${BUILD_DIR}/deploy
   touch ${BUILD_DIR}/deploy/id_rsa
 
-  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 1 ${rtrn}
-  assertEquals "" "`cat ${STD_ERR}`"
-
-  assertContains "       SSH_KEY was invalid"  "`cat ${STD_OUT}`"
+  compile
+  assertCapturedError "SSH_KEY was invalid"
 }
 
 testCompileValidSshKey()
@@ -28,11 +22,9 @@ testCompileValidSshKey()
   mkdir ${BUILD_DIR}/deploy
   ssh-keygen -q -N '' -f ${BUILD_DIR}/deploy/id_rsa
 
-  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 ${rtrn}
-  assertEquals "" "`cat ${STD_ERR}`"
-
-  assertContains "       SSH_KEY was invalid"  "`cat ${STD_OUT}`"
+  compile
+  assertCapturedSuccess
+  assertCaptured "SSH_KEY is valid"
 
   # arrow "Checking GitHub identity"
   # indent `$GIT_SSH -T git@github.com 2>&1`

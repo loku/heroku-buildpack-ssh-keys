@@ -16,8 +16,8 @@ def arrow(str)
 end
 
 buildDir   = ARGV[0]
-privateKey = "#{buildDir}/deploy/id_rsa"
-sshHomeDir = "~/.ssh"
+privateKey = File.expand_path "#{buildDir}/deploy/id_rsa"
+sshHomeDir = File.expand_path "~/.ssh"
 
 arrow "Checking for a valid SSH key"
 
@@ -50,9 +50,11 @@ FileUtils.cp "#{buildDir}/deploy/id_rsa", "#{sshHomeDir}/id_rsa"
 FileUtils.chmod 0600, "#{sshHomeDir}/id_rsa"
 indent "Copied ssh key deploy/id_rsa to user's ssh dir"
 
-FileUtils.cp "#{buildDir}/deploy/known_hosts", "#{sshHomeDir}/known_hosts"
-FileUtils.chmod 0600, "#{sshHomeDir}/known_hosts"
-indent "Copied deploy/known_hosts to user's ssh dir"
+if File::exists? "#{buildDir}/deploy/known_hosts"
+  FileUtils.cp "#{buildDir}/deploy/known_hosts", "#{sshHomeDir}/known_hosts"
+  FileUtils.chmod 0600, "#{sshHomeDir}/known_hosts"
+  indent "Copied deploy/known_hosts to user's ssh dir"
+end
 
 # ENV.delete('SSH_KEY')
 # File.open("#{dir}/known_hosts", 'w+', 0700) do |f|
