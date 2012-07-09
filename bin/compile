@@ -17,6 +17,7 @@ end
 
 buildDir   = ARGV[0]
 privateKey = File.expand_path "#{buildDir}/deploy/id_rsa"
+knownHosts = File.expand_path "#{buildDir}/deploy/known_hosts"
 sshHomeDir = File.expand_path "#{ENV["HOME"]}/.ssh"
 
 arrow "Checking for a valid SSH key"
@@ -28,17 +29,25 @@ else
   indent "Found ssh key deploy/id_rsa"
 end
 
+if !File::exists? knownHosts
+  indent "Can't find the known hosts file"
+  exit 1
+else
+  indent "Found known hosts in deploy/known_hosts"
+end
+
 Dir.mktmpdir "ssh_buildpack" do |dir|
   `ssh-keygen -e -P '' -f #{privateKey} < /dev/null > #{dir}/ssh_buildpack_key.pub.rfc 2>/dev/null`
   `ssh-keygen -i -P '' -f #{dir}/ssh_buildpack_key.pub.rfc > #{dir}/ssh_buildpack_key.pub 2>/dev/null`
-  key = `ssh-keygen -l -f #{dir}/ssh_buildpack_key.pub | awk '{print $2}' | tr -ds ':' '' | egrep -ie "[a-f0-9]{32}" 2>/dev/null`
+  fingerprint = `ssh-keygen -l -f #{dir}/ssh_buildpack_key.pub | awk '{print $2}'`
+  key = `echo "#{fingerprint}" | tr -ds ':' '' | egrep -ie "[a-f0-9]{32}" 2>/dev/null`
 
   # if key is empty, abort the build
   if key.strip == ''
     indent "SSH_KEY was invalid"
     exit 1
   else
-    indent "SSH_KEY is valid"
+    indent "Using SSH_KEY #{fingerprint}"
   end
 end
 
@@ -50,18 +59,6 @@ FileUtils.cp "#{buildDir}/deploy/id_rsa", "#{sshHomeDir}/id_rsa"
 FileUtils.chmod 0600, "#{sshHomeDir}/id_rsa"
 indent "Copied ssh key deploy/id_rsa to user's ssh dir"
 
-if File::exists? "#{buildDir}/deploy/known_hosts"
-  FileUtils.cp "#{buildDir}/deploy/known_hosts", "#{sshHomeDir}/known_hosts"
-  FileUtils.chmod 0600, "#{sshHomeDir}/known_hosts"
-  indent "Copied deploy/known_hosts to user's ssh dir"
-end
-
-# ENV.delete('SSH_KEY')
-# File.open("#{dir}/known_hosts", 'w+', 0700) do |f|
-#   f.puts "github.com,207.97.227.239 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ=="
-# end
-# File.open("#{dir}/git_ssh", 'w+', 0700) do |f|
-#   f.puts "ssh -i #{dir}/env_ssh_key -o 'UserKnownHostsFile #{dir}/known_hosts' $*"
-# end
-# ENV['GIT_SSH'] = "#{dir}/git_ssh"
-# indent "SSH key and known hosts have been installed in ~/.ssh"
+FileUtils.cp "#{buildDir}/deploy/known_hosts", "#{sshHomeDir}/known_hosts"
+FileUtils.chmod 0600, "#{sshHomeDir}/known_hosts"
+indent "Copied deploy/known_hosts to user's ssh dir"

@@ -21,6 +21,7 @@ testCompileInvalidSshKey()
 {
   mkdir ${BUILD_DIR}/deploy
   touch ${BUILD_DIR}/deploy/id_rsa
+  touch ${BUILD_DIR}/deploy/known_hosts
 
   compile
   assertCapturedError "SSH_KEY was invalid"
@@ -30,6 +31,7 @@ testCompileValidSshKey()
 {
   mkdir ${BUILD_DIR}/deploy
   ssh-keygen -q -N '' -f ${BUILD_DIR}/deploy/id_rsa
+  touch ${BUILD_DIR}/deploy/known_hosts
 
   compile
   assertCapturedSuccess
