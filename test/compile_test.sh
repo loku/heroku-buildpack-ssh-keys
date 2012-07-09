@@ -25,14 +25,8 @@ testCompileValidSshKey()
   compile
   assertCapturedSuccess
   assertCaptured "SSH_KEY is valid"
+  assertCaptured "Copied ssh key deploy/id_rsa to user's ssh dir"
+  assertNotCaptured "Copied deploy/known_hosts to user's ssh dir"
 
-  # arrow "Checking GitHub identity"
-  # indent `$GIT_SSH -T git@github.com 2>&1`
-
-}
-
-testCompileShowExistingKey()
-{
-  echo "Existing keys"
-  ls ~/.ssh
+  ssh -T -o StrictHostKeyChecking=no git@github.com
 }
