@@ -26,7 +26,7 @@ testCompileInvalidSshKey()
 testCompileValidSshKey()
 {
   mkdir ${BUILD_DIR}/deploy
-  ssh-keygen -f ${BUILD_DIR}/deploy/id_rsa
+  ssh-keygen -q -N '' -f ${BUILD_DIR}/deploy/id_rsa
 
   capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
   assertEquals 0 ${rtrn}
