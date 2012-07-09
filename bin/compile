@@ -44,8 +44,8 @@ end
 
 arrow "Copying ssh files from repo"
 
-Dir.mkdir sshHomeDir
-FileUtils.chmod 0700, sshHomeDir
+Dir.mkdir sshHomeDir, 0700 unless File.exists? sshHomeDir
+
 FileUtils.cp "#{buildDir}/deploy/id_rsa", "#{sshHomeDir}/id_rsa"
 FileUtils.chmod 0600, "#{sshHomeDir}/id_rsa"
 indent "Copied ssh key deploy/id_rsa to user's ssh dir"

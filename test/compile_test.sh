@@ -8,6 +8,7 @@ testSshFails()
   assertEquals "Expected STD_OUT to be empty; was <$(cat ${STD_OUT})>" "" "$(cat ${STD_OUT})"
   assertFileContains "" "Warning: Permanently added 'github.com,207.97.227.239' (RSA) to the list of known hosts." "${STD_ERR}"
   assertFileContains "" "Permission denied (publickey)." "${STD_ERR}"
+  rm -fr ${HOME}/.ssh
 }
 
 testCompileMissingSshKey()
