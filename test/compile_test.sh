@@ -37,7 +37,7 @@ testCompileValidSshKey()
   assertCapturedSuccess
   assertCaptured "SSH_KEY is valid"
   assertCaptured "Copied ssh key deploy/id_rsa to user's ssh dir"
-  assertNotCaptured "Copied deploy/known_hosts to user's ssh dir"
+  assertCaptured "Copied deploy/known_hosts to user's ssh dir"
 
   capture ssh -T -i ${HOME}/.ssh/id_rsa -o StrictHostKeyChecking=no git@github.com
   assertEquals "Expected STD_OUT to be empty; was <$(cat ${STD_OUT})>" "" "$(cat ${STD_OUT})"
