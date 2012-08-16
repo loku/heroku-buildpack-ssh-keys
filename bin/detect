@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [ -f $HOME/.ssh/id_rsa ]; then
+  echo "Leaving existing SSH key in place"
+  exit 1
+fi
+
 if [ -f $1/deploy/id_rsa ]; then
 
   if [ -f $1/deploy/known_hosts ]; then
